@@ -1,48 +1,56 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 import './item-list.css';
-import Spinner from "../spinner";
+import SwapiService from "../../services/swapi-service";
+import Spinner from "../spinner/spinner";
 
 export default class ItemList extends Component {
-    state = {
-        itemList: null
-    };
 
-    componentDidMount() {
-        const {getData} = this.props;
+  state = {
+    itemList: null
+  };
 
-        getData()
-            .then((itemList) => {
-                this.setState(({itemList}));
-            });
-    }
+  componentDidMount() {
 
-    renderItems(arr) {
-        return arr.map((item) => {
-            const {id} = item;
-            const label = this.props.renderItem(item);
+    const { getData } = this.props;
 
-            return (
-                <li className="list-group-item"
-                    key={id}
-                    onClick={() => this.props.onItemSelected(id)}>
-                    {label}
-                </li>
-            );
+    getData()
+      .then((itemList) => {
+        this.setState({
+          itemList
         });
+      });
+  }
+
+  renderItems(arr) {
+    return arr.map((item) => {
+      const { id } = item;
+      const label = this.props.children(item);
+
+      return (
+        <li className="list-group-item"
+            key={id}
+            onClick={() => this.props.onItemSelected(id)}>
+          {label}
+        </li>
+      );
+    });
+  }
+
+  render() {
+
+    const { itemList } = this.state;
+
+    if (!itemList) {
+      return <Spinner />;
     }
 
-    render() {
-        const {itemList} = this.state;
+    const items = this.renderItems(itemList);
 
-        if (!itemList) {
-            return <Spinner/>
-        }
-
-        return (
-            <ul className="item-list list-group">
-                {this.renderItems(itemList)}
-            </ul>
-        );
-    }
+    return (
+      <ul className="item-list list-group">
+        {items}
+      </ul>
+    );
+  }
 }
